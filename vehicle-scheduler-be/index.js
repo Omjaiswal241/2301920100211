@@ -1,7 +1,7 @@
 const express=require("express");
 const { randomFill } = require("node:crypto");
 const app=express()
-vehicle_count=document.getElementsById("vehicle_count");
+var vehicle_count=0;
 var vehicle=[];
 var j=0;
 var cnt=0;
