@@ -1,11 +1,15 @@
-const express=require('express');
-const app=express();
-function loggermiddleware(req,res,next)
-{
-    console.log("Method is"+req.method);
-    console.log("Host is"+req.hostname);
-    console.log("Route is"+req.url);
-    console.log(new Date());
+function logger(req, res, next) {
+    const start = Date.now();
+
+    res.on("finish", () => {
+        const duration = Date.now() - start;
+
+        console.log(
+            `${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`
+        );
+    });
+
     next();
 }
-app.use(loggermiddleware);
+
+module.exports = logger;

@@ -1,23 +1,40 @@
 const express=require("express");
 const { randomFill } = require("node:crypto");
 const app=express()
-var vehicle_count=0;
-var vehicle=[];
-var j=0;
-var cnt=0;
-app.put("/vehiclein",function(req,res)
-{
-    vehicle[cnt++]=randomFill;
-    vehicle_count++;
-    res.response("In successfully");
-})
-app.get("/no_ofvehicle",function(req,res)
-{
-    res.response(vehicle_count);
-})
-app.get("/getvehicle",function(req,res)
-{
-    res.response(vehicle[j++])
-})
+app.post("/schedules", async (req, res) => {
+    const {
+        vehicleId,
+        driverId,
+        startTime,
+        endTime,
+        source,
+        destination
+    } = req.body;
+
+    const conflict = await Schedule.findOne({
+        vehicleId,
+        status: "scheduled",
+        startTime: { $lt: endTime },
+        endTime: { $gt: startTime }
+    });
+
+    if (conflict) {
+        return res.status(400).json({
+            message: "Vehicle already booked"
+        });
+    }
+
+    const schedule = await Schedule.create({
+        vehicleId,
+        driverId,
+        startTime,
+        endTime,
+        source,
+        destination,
+        status: "scheduled"
+    });
+
+    res.status(201).json(schedule);
+});
 
 app.listen(3000);
